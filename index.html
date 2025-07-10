@@ -231,14 +231,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     // About Page
     const About = {
-      template: `
-        <div>
-          <h2>About This App</h2>
-          <p>this page create by mohd rafiq ali </p>
-        <p> contact : itsali30@gmail.com </p>
-        </div>
-      `
-    };
+  template: `
+    <div style="text-align:center; padding: 20px; font-family: Arial, sans-serif;">
+      <h2 style="color:#333; font-size: 24px;">About This App</h2>
+      <p style="font-size: 16px;">This page was created by <strong>Mohd Rafiq Ali</strong></p>
+      <p style="font-size: 16px;">Contact: <a href="mailto:itsali30@gmail.com">itsali30@gmail.com</a></p>
+      
+      <div style="margin-top: 30px;">
+        <h3 style="color: #555;">☕ Like this app? Donate for a tea!</h3>
+        <img 
+          src="https://chat.openai.com/mnt/data/upi_qrcode_itsali30_ybl_20rs.jpg" 
+          alt="Donate QR Code" 
+          style="width:200px; height:auto; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+        />
+        <p style="font-size: 14px; margin-top: 10px; color: #888;">Scan with any UPI app to donate ₹20</p>
+      </div>
+    </div>
+  `
+};
+
 
     // Vue Router
     const routes = [

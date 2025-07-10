@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR & Barcode SPA</title>
+  <!-- Vue + Vuex + Vue Router -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="https://unpkg.com/vuex@4"></script>
+  <script src="https://unpkg.com/vue-router@4"></script>
+
+  <!-- JsBarcode and QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      background: #f0f0f0;
+      padding: 1em;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: blue;
+    }
+    nav a.router-link-exact-active {
+      font-weight: bold;
+      color: black;
+    }
+    #app {
+      flex: 1;
+      padding: 30px;
+      text-align: center;
+    }
+    input, select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    #qrcode {
+      margin: 20px auto;
+      width: fit-content;
+    }
+    svg {
+      margin-top: 20px;
+    }
+    footer {
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    iframe {
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/about">About</router-link>
+    </nav>
+    <router-view></router-view>
+  </div>
+
+  <!-- YouTube Shorts Footer (autoplay + mute) -->
+  <footer>
+    <iframe
+      width="300"
+      height="500"
+      src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1"
+      title="YouTube Shorts"
+      allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </footer>
+
+  <script>
+    const { createApp, ref, computed, watch, onMounted } = Vue;
+    const { createStore } = Vuex;
+    const { createRouter, createWebHashHistory } = VueRouter;
+
+    // Vuex Store
+    const store = createStore({
+      state() {
+        return {
+          inputText: '',
+          selectedOption: 'HYD_SRB'
+        };
+      },
+      mutations: {
+        setInputText(state, val) { state.inputText = val; },
+        setSelectedOption(state, val) { state.selectedOption = val; }
+      }
+    });
+
+    // Home Page
+    const Home = {
+      template: `
+        <div>
+          <h2>QR & Barcode Generator</h2>
+          <input v-model="inputText" placeholder="Enter text" />
+          <select v-model="selectedOption">
+            <option v-for="opt in options" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+
+          <div v-if="finalText">
+            <h3>QR Code</h3>
+            <div id="qrcode"></div>
+
+            <h3>Barcode</h3>
+            <svg ref="barcode"></svg>
+
+            <p><strong>Generated Text:</strong> {{ finalText }}</p>
+          </div>
+        </div>
+      `,
+      setup() {
+        const barcode = ref(null);
+
+        const inputText = computed({
+          get: () => store.state.inputText,
+          set: val => store.commit('setInputText', val)
+        });
+
+        const selectedOption = computed({
+          get: () => store.state.selectedOption,
+          set: val => store.commit('setSelectedOption', val)
+        });
+
+        const finalText = computed(() => selectedOption.value + inputText.value);
+
+        const options = [
+          'HYD_SRB', 'ZEP_SRB_', 'HYD_RB', 'HYD_IB',
+          'ZEP_RB_', 'ZEP_MIB_', 'ZEP_IB', 'ZEP_IB_'
+        ];
+
+        const generateQRCode = (text) => {
+          const qrEl = document.getElementById("qrcode");
+          qrEl.innerHTML = "";
+          new QRCode(qrEl, {
+            text: text,
+            width: 150,
+            height: 150,
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        };
+
+        watch(finalText, (newVal) => {
+          if (newVal) {
+            generateQRCode(newVal);
+            if (barcode.value) {
+              JsBarcode(barcode.value, newVal, {
+                format: 'CODE128',
+                displayValue: true,
+                lineColor: '#000',
+                width: 2,
+                height: 80
+              });
+            }
+          }
+        });
+
+        onMounted(() => {
+          if (finalText.value) {
+            generateQRCode(finalText.value);
+            JsBarcode(barcode.value, finalText.value, {
+              format: 'CODE128',
+              displayValue: true,
+              lineColor: '#000',
+              width: 2,
+              height: 80
+            });
+          }
+        });
+
+        return { inputText, selectedOption, options, barcode, finalText };
+      }
+    };
+
+    // About Page
+    const About = {
+      template: `
+        <div>
+          <h2>About This App</h2>
+          <p>This Vue 3 SPA generates QR codes and barcodes dynamically based on your input.</p>
+        </div>
+      `
+    };
+
+    // Vue Router
+    const routes = [
+      { path: '/', component: Home },
+      { path: '/about', component: About }
+    ];
+
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes
+    });
+
+    // Create and mount app
+    const app = createApp({});
+    app.use(store);
+    app.use(router);
+    app.mount('#app');
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR & Barcode SPA</title>
+  <!-- Vue + Vuex + Vue Router -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="https://unpkg.com/vuex@4"></script>
+  <script src="https://unpkg.com/vue-router@4"></script>
+
+  <!-- JsBarcode and QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      background: #f0f0f0;
+      padding: 1em;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: blue;
+    }
+    nav a.router-link-exact-active {
+      font-weight: bold;
+      color: black;
+    }
+    #app {
+      flex: 1;
+      padding: 30px;
+      text-align: center;
+    }
+    input, select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    #qrcode {
+      margin: 20px auto;
+      width: fit-content;
+    }
+    svg {
+      margin-top: 20px;
+    }
+    footer {
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    iframe {
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/about">About</router-link>
+    </nav>
+    <router-view></router-view>
+  </div>
+
+  <!-- YouTube Shorts Footer (autoplay + mute) -->
+  <footer>
+    <iframe
+      width="300"
+      height="500"
+      src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1"
+      title="YouTube Shorts"
+      allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </footer>
+
+  <script>
+    const { createApp, ref, computed, watch, onMounted } = Vue;
+    const { createStore } = Vuex;
+    const { createRouter, createWebHashHistory } = VueRouter;
+
+    // Vuex Store
+    const store = createStore({
+      state() {
+        return {
+          inputText: '',
+          selectedOption: 'HYD_SRB'
+        };
+      },
+      mutations: {
+        setInputText(state, val) { state.inputText = val; },
+        setSelectedOption(state, val) { state.selectedOption = val; }
+      }
+    });
+
+    // Home Page
+    const Home = {
+      template: `
+        <div>
+          <h2>QR & Barcode Generator</h2>
+          <input v-model="inputText" placeholder="Enter text" />
+          <select v-model="selectedOption">
+            <option v-for="opt in options" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+
+          <div v-if="finalText">
+            <h3>QR Code</h3>
+            <div id="qrcode"></div>
+
+            <h3>Barcode</h3>
+            <svg ref="barcode"></svg>
+
+            <p><strong>Generated Text:</strong> {{ finalText }}</p>
+          </div>
+        </div>
+      `,
+      setup() {
+        const barcode = ref(null);
+
+        const inputText = computed({
+          get: () => store.state.inputText,
+          set: val => store.commit('setInputText', val)
+        });
+
+        const selectedOption = computed({
+          get: () => store.state.selectedOption,
+          set: val => store.commit('setSelectedOption', val)
+        });
+
+        const finalText = computed(() => selectedOption.value + inputText.value);
+
+        const options = [
+          'HYD_SRB', 'ZEP_SRB_', 'HYD_RB', 'HYD_IB',
+          'ZEP_RB_', 'ZEP_MIB_', 'ZEP_IB', 'ZEP_IB_'
+        ];
+
+        const generateQRCode = (text) => {
+          const qrEl = document.getElementById("qrcode");
+          qrEl.innerHTML = "";
+          new QRCode(qrEl, {
+            text: text,
+            width: 150,
+            height: 150,
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        };
+
+        watch(finalText, (newVal) => {
+          if (newVal) {
+            generateQRCode(newVal);
+            if (barcode.value) {
+              JsBarcode(barcode.value, newVal, {
+                format: 'CODE128',
+                displayValue: true,
+                lineColor: '#000',
+                width: 2,
+                height: 80
+              });
+            }
+          }
+        });
+
+        onMounted(() => {
+          if (finalText.value) {
+            generateQRCode(finalText.value);
+            JsBarcode(barcode.value, finalText.value, {
+              format: 'CODE128',
+              displayValue: true,
+              lineColor: '#000',
+              width: 2,
+              height: 80
+            });
+          }
+        });
+
+        return { inputText, selectedOption, options, barcode, finalText };
+      }
+    };
+
+    // About Page
+    const About = {
+      template: `
+        <div>
+          <h2>About This App</h2>
+          <p>This Vue 3 SPA generates QR codes and barcodes dynamically based on your input.</p>
+        </div>
+      `
+    };
+
+    // Vue Router
+    const routes = [
+      { path: '/', component: Home },
+      { path: '/about', component: About }
+    ];
+
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes
+    });
+
+    // Create and mount app
+    const app = createApp({});
+    app.use(store);
+    app.use(router);
+    app.mount('#app');
+  </script>
+</body>
+</html>

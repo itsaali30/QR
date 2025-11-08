@@ -1,0 +1,85 @@
+const Home = {
+  template: `
+    <div>
+      <h2>QR & Barcode Generator</h2>
+
+      <input v-model="inputText" placeholder="Enter text" />
+
+      <div v-if="inputText">
+        <h3>QR Code</h3>
+        <div id="qrcode"></div>
+
+        <h3>Barcode</h3>
+        <svg ref="barcode"></svg>
+
+        <p><strong>Generated Text:</strong> {{ inputText }}</p>
+
+        <h3>Share This Link</h3>
+        <input :value="shareLink" readonly style="width:80%;padding:10px;font-size:16px;">
+        <button @click="copyLink" style="padding:10px;margin-top:10px;">Copy Link</button>
+      </div>
+    </div>
+  `,
+  setup() {
+    const barcode = ref(null);
+
+    const inputText = computed({
+      get: () => store.state.inputText,
+      set: val => store.commit('setInputText', val)
+    });
+
+    const generateQRCode = (text) => {
+      const qrEl = document.getElementById("qrcode");
+      qrEl.innerHTML = "";
+      new QRCode(qrEl, {
+        text: text,
+        width: 150,
+        height: 150,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    };
+
+    watch(inputText, (newVal) => {
+      if (newVal) {
+        generateQRCode(newVal);
+        if (barcode.value) {
+          JsBarcode(barcode.value, newVal, {
+            format: 'CODE128',
+            displayValue: true,
+            lineColor: '#000',
+            width: 2,
+            height: 80
+          });
+        }
+      }
+    });
+
+    onMounted(() => {
+      const routeText = router.currentRoute.value.params.auto;
+      if (routeText) {
+        inputText.value = routeText;
+      }
+      if (inputText.value) {
+        generateQRCode(inputText.value);
+        JsBarcode(barcode.value, inputText.value, {
+          format: 'CODE128',
+          displayValue: true,
+          lineColor: '#000',
+          width: 2,
+          height: 80
+        });
+      }
+    });
+
+    const shareLink = computed(() => {
+      return window.location.origin + '/' + inputText.value;
+    });
+
+    const copyLink = () => {
+      navigator.clipboard.writeText(shareLink.value);
+      alert("✅ Link Copied!");
+    };
+
+    return { inputText, barcode, shareLink, copyLink };
+  }
+};

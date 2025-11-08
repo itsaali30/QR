@@ -1,85 +1,73 @@
-const Home = {
-  template: `
-    <div>
-      <h2>QR & Barcode Generator</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Auto QR Generator</title>
 
-      <input v-model="inputText" placeholder="Enter text" />
+<!-- Vue -->
+<script src="https://unpkg.com/vue@3"></script>
 
-      <div v-if="inputText">
-        <h3>QR Code</h3>
-        <div id="qrcode"></div>
+<!-- QR Code Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
 
-        <h3>Barcode</h3>
-        <svg ref="barcode"></svg>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }
+  #qrcode { margin-top: 30px; }
+</style>
+</head>
 
-        <p><strong>Generated Text:</strong> {{ inputText }}</p>
+<body>
+<div id="app">
+  <h2>Auto QR Generator</h2>
 
-        <h3>Share This Link</h3>
-        <input :value="shareLink" readonly style="width:80%;padding:10px;font-size:16px;">
-        <button @click="copyLink" style="padding:10px;margin-top:10px;">Copy Link</button>
-      </div>
-    </div>
-  `,
-  setup() {
-    const barcode = ref(null);
+  <p v-if="!code">❌ No code found in URL</p>
+  <p v-else>QR Code for: <b>{{ code }}</b></p>
 
-    const inputText = computed({
-      get: () => store.state.inputText,
-      set: val => store.commit('setInputText', val)
-    });
+  <div id="qrcode"></div>
 
-    const generateQRCode = (text) => {
-      const qrEl = document.getElementById("qrcode");
-      qrEl.innerHTML = "";
-      new QRCode(qrEl, {
-        text: text,
-        width: 150,
-        height: 150,
+  <br/><br/>
+  <button @click="copyLink">Copy Share Link</button>
+</div>
+
+
+<script>
+const app = Vue.createApp({
+  data() {
+    return {
+      code: ""
+    }
+  },
+  mounted() {
+    // ✅ Extract code from URL: #/ind/abc23
+    const hash = window.location.hash;
+    const parts = hash.split("/");
+
+    // parts = ["#/ind", "abc23"]
+    this.code = parts[2] || "";
+
+    if (this.code) {
+      this.generateQR();
+    }
+  },
+  methods: {
+    generateQR() {
+      document.getElementById("qrcode").innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), {
+        text: this.code,
+        width: 250,
+        height: 250,
         correctLevel: QRCode.CorrectLevel.H
       });
-    };
-
-    watch(inputText, (newVal) => {
-      if (newVal) {
-        generateQRCode(newVal);
-        if (barcode.value) {
-          JsBarcode(barcode.value, newVal, {
-            format: 'CODE128',
-            displayValue: true,
-            lineColor: '#000',
-            width: 2,
-            height: 80
-          });
-        }
-      }
-    });
-
-    onMounted(() => {
-      const routeText = router.currentRoute.value.params.auto;
-      if (routeText) {
-        inputText.value = routeText;
-      }
-      if (inputText.value) {
-        generateQRCode(inputText.value);
-        JsBarcode(barcode.value, inputText.value, {
-          format: 'CODE128',
-          displayValue: true,
-          lineColor: '#000',
-          width: 2,
-          height: 80
-        });
-      }
-    });
-
-    const shareLink = computed(() => {
-      return window.location.origin + '/' + inputText.value;
-    });
-
-    const copyLink = () => {
-      navigator.clipboard.writeText(shareLink.value);
-      alert("✅ Link Copied!");
-    };
-
-    return { inputText, barcode, shareLink, copyLink };
+    },
+    copyLink() {
+      const shareURL = window.location.origin + "/#/" + "ind/" + this.code;
+      navigator.clipboard.writeText(shareURL);
+      alert("✅ Link Copied:\n" + shareURL);
+    }
   }
-};
+});
+
+app.mount("#app");
+</script>
+</body>
+</html>

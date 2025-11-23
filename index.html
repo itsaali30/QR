@@ -103,8 +103,13 @@
         const finalText = computed(() => selectedOption.value + inputText.value);
 
         const options = [
-          'HYD_SRB', 'ZEP_SRB_', 'HYD_RB', 'HYD_IB','08_SRB',
-          'ZEP_RB_', 'ZEP_MIB_', 'ZEP_IB', 'ZEP_IB_'
+          'HYD_SRB', 'ZEP_SRB_', '08_SRB_','09_SRB_','10_SRB_',
+          'HYD_RB',
+          '',
+          'HYD_IB','ZEP_IB_','08_IB_', '09_IB_','10_IB_',
+          'ZEP_RB_', 
+          'ZEP_MIB_','08_MIB_', '09_MIB_', '10_MIB_', 
+          'ZEP_IB', 
         ];
 
         const generateQRCode = (text) => {

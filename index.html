@@ -10,19 +10,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 30px; background: #f5f5f5; }
-    .color-buttons { margin: 20px 0; }
-    .color-btn {
-      margin: 10px;
-      padding: 15px 30px;
-      font-size: 1.2em;
+    .color-section { margin: 30px 0; background: white; padding: 20px; border-radius: 10px; }
+    .color-label { font-size: 1.5em; font-weight: bold; margin-bottom: 15px; }
+    .number-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .num-btn {
+      padding: 15px 20px;
+      font-size: 1.1em;
       font-weight: bold;
-      border: 3px solid #333;
+      border: 2px solid #333;
       border-radius: 8px;
       cursor: pointer;
       transition: transform 0.2s;
+      min-width: 50px;
     }
-    .color-btn:hover { transform: scale(1.1); }
-    .color-btn:active { transform: scale(0.95); }
+    .num-btn:hover { transform: scale(1.1); }
+    .num-btn:active { transform: scale(0.95); }
     .btn-wht { background: white; color: black; }
     .btn-blu { background: #2196F3; color: white; }
     .btn-grn { background: #4CAF50; color: white; }
@@ -45,7 +47,7 @@
   </div>
 
   <script>
-    const { createApp, ref, computed, watch } = Vue;
+    const { createApp, ref, computed } = Vue;
     const { createStore } = Vuex;
     const { createRouter, createWebHashHistory } = VueRouter;
 
@@ -53,16 +55,12 @@
     const store = createStore({
       state() {
         return {
-          currentColor: '',
-          currentNumber: 0,
           finalText: ''
         };
       },
       mutations: {
-        generateCode(state, color) {
-          state.currentColor = color;
-          state.currentNumber = (state.currentNumber % 9) + 1;
-          state.finalText = `${color}_${state.currentNumber}`;
+        setFinalText(state, text) {
+          state.finalText = text;
         }
       }
     });
@@ -73,12 +71,59 @@
         <div>
           <h2>QR & Barcode Color Generator</h2>
           
-          <div class="color-buttons">
-            <button class="color-btn btn-wht" @click="generateCode('WHT')">WHT</button>
-            <button class="color-btn btn-blu" @click="generateCode('BLU')">BLU</button>
-            <button class="color-btn btn-grn" @click="generateCode('GRN')">GRN</button>
-            <button class="color-btn btn-ylw" @click="generateCode('YLW')">YLW</button>
-            <button class="color-btn btn-red" @click="generateCode('RED')">RED</button>
+          <div class="color-section">
+            <div class="color-label" style="color: black;">WHT (White)</div>
+            <div class="number-buttons">
+              <button v-for="num in 9" :key="num" 
+                      class="num-btn btn-wht" 
+                      @click="generateCode('WHT', num)">
+                {{ num }}
+              </button>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <div class="color-label" style="color: #2196F3;">BLU (Blue)</div>
+            <div class="number-buttons">
+              <button v-for="num in 9" :key="num" 
+                      class="num-btn btn-blu" 
+                      @click="generateCode('BLU', num)">
+                {{ num }}
+              </button>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <div class="color-label" style="color: #4CAF50;">GRN (Green)</div>
+            <div class="number-buttons">
+              <button v-for="num in 9" :key="num" 
+                      class="num-btn btn-grn" 
+                      @click="generateCode('GRN', num)">
+                {{ num }}
+              </button>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <div class="color-label" style="color: #F9A825;">YLW (Yellow)</div>
+            <div class="number-buttons">
+              <button v-for="num in 9" :key="num" 
+                      class="num-btn btn-ylw" 
+                      @click="generateCode('YLW', num)">
+                {{ num }}
+              </button>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <div class="color-label" style="color: #F44336;">RED (Red)</div>
+            <div class="number-buttons">
+              <button v-for="num in 9" :key="num" 
+                      class="num-btn btn-red" 
+                      @click="generateCode('RED', num)">
+                {{ num }}
+              </button>
+            </div>
           </div>
 
           <div v-if="finalText" class="output-container">
@@ -95,18 +140,10 @@
       setup() {
         const barcode = ref(null);
         const finalText = computed(() => store.state.finalText);
-        const colorCounters = ref({
-          WHT: 0,
-          BLU: 0,
-          GRN: 0,
-          YLW: 0,
-          RED: 0
-        });
 
-        const generateCode = (color) => {
-          colorCounters.value[color] = (colorCounters.value[color] % 9) + 1;
-          const code = `${color}_${colorCounters.value[color]}`;
-          store.state.finalText = code;
+        const generateCode = (color, num) => {
+          const code = `${color}_${num}`;
+          store.commit('setFinalText', code);
           
           generateQRCode(code);
           if (barcode.value) {
@@ -142,8 +179,8 @@
       template: `
         <div>
           <h2>About This App</h2>
-          <p>Click color buttons to generate QR codes and barcodes.</p>
-          <p>Each color maintains its own counter from 1 to 9.</p>
+          <p>Click any numbered button under each color to generate QR codes and barcodes.</p>
+          <p>Format: COLOR_NUMBER (e.g., WHT_1, BLU_5, RED_9)</p>
         </div>
       `
     };

@@ -47,35 +47,69 @@
     </nav>
     <router-view></router-view>
     <hr>
-  <div style="display:flex; gap:30px; align-items:center; justify-content:center; flex-wrap:wrap; margin-top:40px;">
+<template>
+  <div class="carousel">
+    <div class="carousel-inner">
 
-  <div style="text-align:center;">
-    <h3>📸 Noor – 2025</h3>
-    <a href="https://res.cloudinary.com/mandmshop/image/upload/v1752402615/IMG_20250713_155653_pal2de.jpg" target="_blank">
-      <img 
-        src="https://res.cloudinary.com/mandmshop/image/upload/v1752402615/IMG_20250713_155653_pal2de.jpg"
-        alt="Framed Image"
-        style="max-width:300px;width:100%;border:5px solid #eee;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.2);transition:0.3s;cursor:pointer;"
-        onmouseover="this.style.transform='scale(1.05)'"
-        onmouseout="this.style.transform='scale(1)'"
-      />
-    </a>
+      <div class="carousel-item">
+        <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628206/IMG-20251109-WA0001_pqz82h.jpg" />
+      </div>
+
+      <div class="carousel-item">
+        <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628444/IMG-20251109-WA0000_blnqcp.jpg" />
+      </div>
+
+      <div class="carousel-item">
+        <img src="https://res.cloudinary.com/mandmshop/image/upload/v1752402615/IMG_20250713_155653_pal2de.jpg" />
+      </div>
+
+      <div class="carousel-item">
+        <img src="https://res.cloudinary.com/mandmshop/image/upload/v1761308356/IMG-20251024-WA0013_serib8.jpg" />
+      </div>
+
+    </div>
   </div>
+</template>
 
-  <div style="text-align:center;">
-    <h3>📸 Jamal – 2025</h3>
-    <a href="https://res.cloudinary.com/mandmshop/image/upload/v1761308356/IMG-20251024-WA0013_serib8.jpg" target="_blank">
-      <img 
-        src="https://res.cloudinary.com/mandmshop/image/upload/v1761308356/IMG-20251024-WA0013_serib8.jpg"
-        alt="Framed Image"
-        style="max-width:300px;width:100%;border:5px solid #eee;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.2);transition:0.3s;cursor:pointer;"
-        onmouseover="this.style.transform='scale(1.05)'"
-        onmouseout="this.style.transform='scale(1)'"
-      />
-    </a>
-  </div>
+<style scoped>
+.carousel {
+  width: 320px;
+  height: 420px;
+  margin: 40px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
 
-</div>
+.carousel-inner {
+  display: flex;
+  width: 400%;
+  height: 100%;
+  animation: slide 12s infinite;
+}
+
+.carousel-item {
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* Auto slide */
+@keyframes slide {
+  0%, 20%   { transform: translateX(0%); }
+  25%, 45%  { transform: translateX(-100%); }
+
+  50%, 70%  { transform: translateX(-200%); }
+
+  75%, 100% { transform: translateX(-300%); }
+}
+</style>
 
   <footer>
     <iframe

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR & Barcode</title>
+  <title>QRBR — QR & Barcode Studio</title>
 
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,111 +23,78 @@
   <style>
     :root{
       --primary: #0d6efd;
-      --bg: #f6f8fb;
-      --card-radius: 12px;
+      --bg: #f5f7fb;
+      --card-radius: 14px;
+      --glass: rgba(255,255,255,0.92);
+      --muted: #6b7280;
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: var(--bg);
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+    html,body { height:100%; margin:0; background: var(--bg); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; color:#0f1724; }
+
+    /* Background YouTube (desktop) */
+    .bg-youtube {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      pointer-events: none; /* make it non-interactive */
+      opacity: 0.06;
+      filter: blur(0.8px) saturate(0.8);
+      display: none;
+    }
+    @media (min-width: 900px) {
+      .bg-youtube { display:block; }
+    }
+    .bg-youtube iframe {
+      width: 140%;
+      height: 140%;
+      transform: translate(-10%, -10%);
+      border: 0;
     }
 
     /* NAVBAR */
-    .app-navbar {
-      backdrop-filter: blur(6px);
-      background: rgba(255,255,255,0.94);
-      border-bottom: 1px solid rgba(0,0,0,0.04);
-      box-shadow: 0 6px 18px rgba(12, 13, 14, .04);
-    }
-    .brand-title { font-weight: 700; font-size: 1.05rem; }
+    .app-navbar { backdrop-filter: blur(6px); background: var(--glass); border-bottom: 1px solid rgba(0,0,0,0.04); box-shadow: 0 6px 18px rgba(12, 13, 14, .04); }
+    .brand-title { font-weight:700; font-size:1.05rem; }
 
-    /* Offcanvas drawer width */
     .offcanvas-start.custom-drawer { width: 300px; max-width: 85%; }
 
-    /* Main container */
-    .main-container {
-      max-width: 1100px;
-      margin: 22px auto;
-      padding: 12px;
-      padding-bottom: 140px; /* leave space for sticky footer */
-    }
+    /* layout */
+    .main-container { max-width: 1100px; margin: 22px auto; padding: 12px; padding-bottom: 160px; }
+    .card-ui { border-radius: var(--card-radius); box-shadow: 0 8px 30px rgba(15,23,42,0.04); }
 
-    .card-ui {
-      border-radius: var(--card-radius);
-      box-shadow: 0 8px 30px rgba(15,23,42,0.04);
-    }
+    /* carousel images */
+    .home-carousel .carousel-item img { width:100%; height:420px; object-fit:cover; border-radius:10px; }
+    @media (max-width:900px) { .home-carousel .carousel-item img { height:300px; } }
+    @media (max-width:520px) { .home-carousel .carousel-item img { height:220px; } }
 
-    /* Carousel specifics */
-    .home-carousel .carousel-item img {
-      width: 100%;
-      height: 420px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-    @media (max-width: 900px) {
-      .home-carousel .carousel-item img { height: 300px; }
-    }
-    @media (max-width: 520px) {
-      .home-carousel .carousel-item img { height: 220px; }
-    }
-
-    /* QR & Barcode preview area */
-    .qr-preview-center {
-  text-align: center !important;
-}
-
-#qrcode, #qrcode-bin {
-  display: inline-block !important;
-}
-
+    /* preview */
+    .preview-box { text-align:center !important; }
     #qrcode, #qrcode-bin { margin: 8px auto; display:block; }
-    svg { display:block; margin: 8px auto; max-width:100%; height:auto; }
+    svg[id^="barcode"] { display:block; margin: 8px auto; max-width:100%; height:auto; }
 
-    /* Sticky footer iframe */
-    .sticky-footer {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 92px;
-      background: rgba(255,255,255,0.96);
-      border-top: 1px solid rgba(0,0,0,0.06);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1200;
-      padding: 8px;
-    }
-    .sticky-footer .iframe-wrap {
-      width: 340px;
-      height: 74px;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(15,23,42,0.06);
-      border: 1px solid rgba(0,0,0,0.04);
-    }
-    @media (min-width: 992px) {
-      .sticky-footer .iframe-wrap { width: 560px; height: 80px; }
-    }
+    /* sticky footer */
+    .sticky-footer { position: fixed; left:0; right:0; bottom:0; height:92px; background: var(--glass); border-top:1px solid rgba(0,0,0,0.06); display:flex; justify-content:center; align-items:center; z-index:1200; padding:8px; }
+    .sticky-footer .iframe-wrap { width:340px; height:74px; border-radius:10px; overflow:hidden; box-shadow:0 8px 30px rgba(15,23,42,0.06); border:1px solid rgba(0,0,0,0.04); }
+    @media (min-width:992px) { .sticky-footer .iframe-wrap { width:560px; height:80px; } }
 
-    /* Button styles */
-    .num-btn { min-width: 48px; min-height: 44px; border-radius: 10px; font-weight: 700; }
+    .num-btn { min-width:48px; min-height:44px; border-radius:10px; font-weight:700; }
 
-    /* router card */
-    .router-card { padding: 18px; background: white; border-radius: 12px; }
+    /* small-screen spacing to avoid footer overlap */
+    @media (max-height:600px) { .main-container { padding-bottom:220px; } }
 
-    /* small adjustments so content not hidden behind footer on small screens */
-    @media (max-height: 600px) {
-      .main-container { padding-bottom: 200px; }
-    }
+    /* subtle helpers */
+    .muted { color: var(--muted); }
+    .controls-row { gap:12px; display:flex; flex-wrap:wrap; align-items:center; }
   </style>
 </head>
 <body>
   <div id="app">
+    <!-- Background YouTube (muted + autoplay + loop) -->
+    <div class="bg-youtube" aria-hidden="true">
+      <!-- Replace VIDEO_ID with your video id (from the URL). We also add playlist=VIDEO_ID for looping -->
+      <iframe src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1&controls=0&loop=1&playlist=WymKNMXDEpI&rel=0&showinfo=0" allow="autoplay; encrypted-media" title="Background"></iframe>
+    </div>
+
     <!-- NAVBAR -->
     <header class="app-navbar sticky-top">
       <div class="container">
@@ -148,9 +115,9 @@
 
           <div class="d-flex align-items-center gap-2">
             <nav class="d-flex gap-2">
-              <router-link to="/" class="nav-link px-2 fas-fa-home" exact>Home</router-link>
-              <router-link to="/bin" class="nav-link px-2 fas-fa-bin">Bin</router-link>
-              <router-link to="/about" class="nav-link px-2 fas-fa-profile">About</router-link>
+              <router-link to="/" class="nav-link px-2" exact>Home</router-link>
+              <router-link to="/bin" class="nav-link px-2">Bin</router-link>
+              <router-link to="/about" class="nav-link px-2">About</router-link>
             </nav>
             <button class="btn btn-outline-secondary d-none d-lg-inline-flex align-items-center"><i class="fa-solid fa-download me-2"></i>Export</button>
           </div>
@@ -181,11 +148,11 @@
       </div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main class="main-container">
       <div class="row gy-3">
         <div class="col-12">
-          <div class="router-card card-ui">
+          <div class="router-card card-ui p-3">
             <router-view></router-view>
           </div>
         </div>
@@ -208,13 +175,15 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- App Script: Vue, Vuex, Vue Router components (logic preserved) -->
+  <!-- App Script -->
   <script>
-    const { createApp, ref, computed, watch, onMounted } = Vue;
+    const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
     const { createStore } = Vuex;
     const { createRouter, createWebHashHistory } = VueRouter;
 
-    // Vuex store (unchanged logic)
+    // -----------------------
+    // Store (global state)
+    // -----------------------
     const store = createStore({
       state() {
         return {
@@ -226,317 +195,449 @@
       mutations: {
         setInputText(state, val) { state.inputText = val; },
         setSelectedOption(state, val) { state.selectedOption = val; },
-        setFinalText(state, text) { state.finalText = text; }
+        setFinalText(state, val) { state.finalText = val; }
       }
     });
 
-    // HOME - with Carousel (auto + arrows + indicators) — gallery only here
+    // -----------------------
+    // Utility: debounce
+    // -----------------------
+    function debounce(fn, wait = 250) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    // -----------------------
+    // HOME component
+    // -----------------------
     const Home = {
       template: `
-        <div>
-          <div class="row gy-3">
-            <!-- Controls & preview -->
-            <div class="col-12 col-lg-6">
-              <h4 class="mb-3">QR & Barcode Generator</h4>
+      <div>
+        <div class="row gy-3">
+          <!-- Controls & preview -->
+          <div class="col-12 col-lg-6">
+            <h4 class="mb-3">QR & Barcode Generator</h4>
 
-              <div class="mb-2">
-                <label class="form-label small">Prefix</label>
-                <select class="form-select form-select-sm" v-model="selectedOption">
-                  <option v-for="opt in options" :key="opt" :value="opt">{{ opt || '(empty)' }}</option>
-                </select>
-              </div>
+            <div class="mb-2">
+              <label class="form-label small">Prefix</label>
+              <select class="form-select form-select-sm" v-model="selectedOption">
+                <option v-for="opt in options" :key="opt" :value="opt">{{ opt || '(empty)' }}</option>
+              </select>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label small">Input text</label>
-                <input class="form-control form-control-lg" v-model="inputText" placeholder="Enter text (e.g. 12345)" />
-              </div>
+            <div class="mb-2">
+              <label class="form-label small">Input text</label>
+              <input class="form-control form-control-lg" v-model="inputText" placeholder="Enter text (e.g. 12345)" />
+            </div>
 
-              <div class="d-flex gap-2 mt-2">
-                <button class="btn btn-primary" @click="copyFinal"><i class="fa-regular fa-copy me-2"></i>Copy</button>
-                <button class="btn btn-outline-secondary" @click="clearAll"><i class="fa-solid fa-eraser me-2"></i>Clear</button>
-                <button class="btn btn-success" @click="downloadQr"><i class="fa-solid fa-download me-2"></i>Download QR</button>
-              </div>
-
-              <div class="mt-3 small text-muted">
-                <strong>Final text:</strong> <span class="fw-semibold">{{ finalText }}</span>
+            <div class="controls-row mt-2">
+              <button class="btn btn-primary" @click="copyFinal" :disabled="!finalText"><i class="fa-regular fa-copy me-2"></i>Copy</button>
+              <button class="btn btn-outline-secondary" @click="clearAll"><i class="fa-solid fa-eraser me-2"></i>Clear</button>
+              <div class="btn-group ms-auto">
+                <button class="btn btn-success" @click="downloadQr" :disabled="!qrPresent"><i class="fa-solid fa-download me-2"></i>Download QR</button>
+                <button class="btn btn-outline-dark" @click="downloadBarcode" :disabled="!barcodePresent"><i class="fa-solid fa-download me-2"></i>Download Barcode</button>
               </div>
             </div>
 
-            <!-- Preview -->
-            <div class="col-12 col-lg-6">
-              <div class="border rounded-3 p-3 bg-white text-center">
+            <div class="mt-3 small text-muted">
+              <strong>Final text:</strong> <span class="fw-semibold">{{ finalText || '—' }}</span>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="col-12 col-lg-6">
+            <div class="border rounded-3 p-3 bg-white preview-box">
+              <div class="d-flex flex-column align-items-center">
                 <h6 class="mb-2">Preview</h6>
-                <div id="qrcode" aria-hidden="true"></div>
-                <svg ref="barcode" id="barcode-visual"></svg>
-                <div class="mt-2 small text-muted">CODE128 — best for scanners</div>
-              </div>
-            </div>
-
-            <!-- Carousel gallery -->
-            <div class="col-12">
-              <div class="mt-3 p-3 bg-white rounded-3 card-ui">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    <h5 class="mb-0">Gallery</h5>
-                    <small class="text-muted">Auto sliding carousel • swipeable on touch</small>
-                  </div>
-                  <div>
-                    <button class="btn btn-sm btn-outline-secondary me-1" data-bs-target="#homeCarousel" data-bs-slide="prev"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#homeCarousel" data-bs-slide="next"><i class="fa-solid fa-chevron-right"></i></button>
-                  </div>
-                </div>
-
-                <div id="homeCarousel" class="carousel slide home-carousel" data-bs-ride="carousel" data-bs-interval="3000">
-                  <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                  </div>
-
-                  <div class="carousel-inner rounded-3">
-                    <div class="carousel-item active">
-                      <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628206/IMG-20251109-WA0001_pqz82h.jpg" class="d-block w-100" alt="1">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628444/IMG-20251109-WA0000_blnqcp.jpg" class="d-block w-100" alt="2">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="https://res.cloudinary.com/mandmshop/image/upload/v1752402615/IMG_20250713_155653_pal2de.jpg" class="d-block w-100" alt="3">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="https://res.cloudinary.com/mandmshop/image/upload/v1761308356/IMG-20251024-WA0013_serib8.jpg" class="d-block w-100" alt="4">
-                    </div>
-                  </div>
-
-                  <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                  </button>
-                </div>
-
+                <div id="qrcode" aria-hidden="true" ref="qrcodeWrap"></div>
+                <svg ref="barcodeSvg" id="barcode-visual"></svg>
+                <div class="mt-2 small muted">CODE128 — best for scanners</div>
               </div>
             </div>
           </div>
+
+          <!-- Carousel gallery -->
+          <div class="col-12">
+            <div class="mt-3 p-3 bg-white rounded-3 card-ui">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="mb-0">Gallery</h5>
+                  <small class="text-muted">Auto sliding • swipeable</small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-secondary me-1" data-bs-target="#homeCarousel" data-bs-slide="prev"><i class="fa-solid fa-chevron-left"></i></button>
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-target="#homeCarousel" data-bs-slide="next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+              </div>
+
+              <div id="homeCarousel" class="carousel slide home-carousel" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-indicators">
+                  <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                  <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                  <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                  <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                </div>
+
+                <div class="carousel-inner rounded-3">
+                  <div class="carousel-item active">
+                    <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628206/IMG-20251109-WA0001_pqz82h.jpg" class="d-block w-100" alt="1">
+                  </div>
+                  <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/mandmshop/image/upload/v1762628444/IMG-20251109-WA0000_blnqcp.jpg" class="d-block w-100" alt="2">
+                  </div>
+                  <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/mandmshop/image/upload/v1752402615/IMG_20250713_155653_pal2de.jpg" class="d-block w-100" alt="3">
+                  </div>
+                  <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/mandmshop/image/upload/v1761308356/IMG-20251024-WA0013_serib8.jpg" class="d-block w-100" alt="4">
+                  </div>
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
         </div>
+      </div>
       `,
       setup() {
-        const barcode = ref(null);
+        // refs
+        const qrcodeWrap = ref(null);
+        const barcodeSvg = ref(null);
+
+        // store bindings
         const inputText = computed({
           get: () => store.state.inputText,
-          set: val => store.commit('setInputText', val)
+          set: (v) => store.commit('setInputText', v)
         });
         const selectedOption = computed({
           get: () => store.state.selectedOption,
-          set: val => store.commit('setSelectedOption', val)
+          set: (v) => store.commit('setSelectedOption', v)
         });
-        const finalText = computed(() => (selectedOption.value || '') + (inputText.value || '') );
+        const finalText = computed(() => (selectedOption.value || '') + (inputText.value || ''));
 
+        // local flags
+        const qrPresent = ref(false);
+        const barcodePresent = ref(false);
+
+        // options
         const options = [
           'HYD_SRB', 'ZEP_SRB_', '08_SRB_','09_SRB_','10_SRB_',
-          'HYD_RB',
-          '',
-          'HYD_IB','ZEP_IB_','08_IB_', '09_IB_','10_IB_',
-          'ZEP_RB_', 
-          'ZEP_MIB_','08_MIB_', '09_MIB_', '10_MIB_', 
-          'ZEP_IB', 
+          'HYD_RB', '', 'HYD_IB','ZEP_IB_','08_IB_', '09_IB_','10_IB_',
+          'ZEP_RB_', 'ZEP_MIB_','08_MIB_', '09_MIB_', '10_MIB_', 'ZEP_IB',
         ];
 
-        const generateQRCode = (text) => {
-          const qrEl = document.getElementById("qrcode");
-          if (qrEl) {
-            qrEl.innerHTML = "";
-            new QRCode(qrEl, {
-              text: text || '',
-              width: Math.min(220, Math.max(120, window.innerWidth * 0.24)),
-              height: Math.min(220, Math.max(120, window.innerWidth * 0.24)),
-              correctLevel: QRCode.CorrectLevel.H
-            });
-          }
-        };
+        // generate QR into a DOM element using qrcode.js (must be called after DOM updated)
+        function renderQRCode(text) {
+          const el = qrcodeWrap.value;
+          if (!el) return;
+          el.innerHTML = '';
+          if (!text) { qrPresent.value = false; return; }
+          new QRCode(el, {
+            text: text,
+            width: Math.min(260, Math.max(140, window.innerWidth * 0.24)),
+            height: Math.min(260, Math.max(140, window.innerWidth * 0.24)),
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          qrPresent.value = true;
+        }
 
-        watch(finalText, (newVal) => {
-          if (newVal !== undefined) {
-            generateQRCode(newVal);
-            if (barcode.value) {
-              try{
-                JsBarcode(barcode.value, newVal || ' ', {
-                  format: 'CODE128',
-                  displayValue: true,
-                  lineColor: '#000',
-                  width: 2,
-                  height: 60
-                });
-              }catch(err){}
-            }
+        // render barcode using JsBarcode
+        function renderBarcode(text) {
+          const svg = barcodeSvg.value;
+          if (!svg) return;
+          if (!text) {
+            svg.innerHTML = '';
+            barcodePresent.value = false;
+            return;
           }
-        }, { immediate: true });
+          try {
+            JsBarcode(svg, text, {
+              format: 'CODE128',
+              displayValue: true,
+              lineColor: '#000',
+              width: 2,
+              height: 60,
+              margin: 6
+            });
+            barcodePresent.value = true;
+          } catch (e) {
+            // ignore
+            barcodePresent.value = false;
+          }
+        }
+
+        // Debounced combined update to avoid too many renders while typing
+        const updatePreviews = debounce(async () => {
+          await nextTick();
+          const value = finalText.value;
+          renderQRCode(value);
+          renderBarcode(value);
+        }, 220);
+
+        // watch finalText
+        watch(finalText, () => updatePreviews(), { immediate: true });
 
         onMounted(() => {
-          if (finalText.value) {
-            generateQRCode(finalText.value);
-            try {
-              JsBarcode(barcode.value, finalText.value, {
-                format: 'CODE128',
-                displayValue: true,
-                lineColor: '#000',
-                width: 2,
-                height: 60
-              });
-            } catch(e){}
-          }
+          // initial render if anything present
+          updatePreviews();
         });
 
-        const copyFinal = () => {
+        // copy final
+        const copyFinal = async () => {
           const text = finalText.value || '';
-          navigator.clipboard?.writeText(text).then(()=> alert('Copied: ' + text)).catch(()=> alert('Copy failed'));
+          if (!text) return alert('Nothing to copy');
+          try {
+            await navigator.clipboard.writeText(text);
+            alert('Copied: ' + text);
+          } catch (e) {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); alert('Copied: ' + text); } catch { alert('Copy failed'); }
+            ta.remove();
+          }
         };
 
+        // clear
         const clearAll = () => {
           store.commit('setInputText', '');
-          store.commit('setSelectedOption', options[0]);
+          store.commit('setSelectedOption', options[0] || '');
           store.commit('setFinalText', '');
-          const el = document.getElementById('qrcode');
-          if (el) el.innerHTML = '';
-          const el2 = document.getElementById('qrcode-bin');
-          if (el2) el2.innerHTML = '';
+          // clear dom
+          if (qrcodeWrap.value) qrcodeWrap.value.innerHTML = '';
+          if (barcodeSvg.value) barcodeSvg.value.innerHTML = '';
         };
 
+        // download QR (PNG from canvas/img or fallback)
         const downloadQr = () => {
-          const qrEl = document.getElementById('qrcode');
-          if (!qrEl) { alert('QR not found'); return; }
-          const img = qrEl.querySelector('img') || qrEl.querySelector('canvas');
-          if (img && img.src) {
+          const el = qrcodeWrap.value;
+          if (!el) { alert('QR not found'); return; }
+          // qrcode.js produces an <img> or <canvas> inside
+          const img = el.querySelector('img') || el.querySelector('canvas');
+          if (img && (img.src || img.toDataURL)) {
+            const href = img.src || img.toDataURL('image/png');
             const a = document.createElement('a');
-            a.href = img.src;
+            a.href = href;
             a.download = (finalText.value || 'qr') + '.png';
             a.click();
           } else {
-            alert('Unable to export. Try after QR is generated.');
+            alert('Unable to export QR yet. Try again after it appears.');
           }
         };
 
-        return { barcode, inputText, selectedOption, options, finalText, copyFinal, clearAll, downloadQr };
+        // download barcode as SVG file
+        const downloadBarcode = () => {
+          const svgEl = barcodeSvg.value;
+          if (!svgEl) { alert('Barcode not found'); return; }
+          const svgText = svgEl.outerHTML;
+          const blob = new Blob([svgText], { type: 'image/svg+xml' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = (finalText.value || 'barcode') + '.svg';
+          a.click();
+          URL.revokeObjectURL(url);
+        };
+
+        // update store finalText whenever a code from other components wants to set one
+        watch(() => store.state.finalText, (val) => {
+          // when bin sets finalText, reflect it in preview by rendering
+          if (val) {
+            // keep selectedOption and inputText unchanged; directly render val
+            store.commit('setSelectedOption', ''); // prevent doubling if bin code already contains prefix
+            store.commit('setInputText', ''); // optional
+            // show the value as finalText store
+            // render directly
+            nextTick(() => {
+              renderQRCode(val);
+              renderBarcode(val);
+            });
+          }
+        });
+
+        // return to template
+        return {
+          qrcodeWrap, barcodeSvg, inputText, selectedOption, finalText, options,
+          copyFinal, clearAll, downloadQr, downloadBarcode, qrPresent, barcodePresent
+        };
       }
     };
 
-    // BIN component (unchanged logic, UI updated)
+    // -----------------------
+    // BIN component
+    // -----------------------
     const Bin = {
       template: `
-        <div>
-          <h4 class="mb-3">Bin Color Generator</h4>
+      <div>
+        <h4 class="mb-3">Bin Color Generator</h4>
 
-          <div class="row gy-3">
-            <div class="col-12 col-md-6">
-              <div class="card p-3">
-                <div class="mb-3"><strong>Pick a color and number</strong></div>
+        <div class="row gy-3">
+          <div class="col-12 col-md-6">
+            <div class="card p-3">
+              <div class="mb-3"><strong>Pick a color and number</strong></div>
 
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                  <button v-for="num in 9" :key="'w'+num" @click="generateCode('WHT', num)" class="btn btn-light num-btn">WHT {{num}}</button>
-                  <button v-for="num in 9" :key="'b'+num" @click="generateCode('BLU', num)" class="btn btn-primary num-btn">BLU {{num}}</button>
-                  <button v-for="num in 9" :key="'g'+num" @click="generateCode('GRN', num)" class="btn btn-success num-btn">GRN {{num}}</button>
-                  <button v-for="num in 9" :key="'y'+num" @click="generateCode('YLW', num)" class="btn btn-warning num-btn">YLW {{num}}</button>
-                  <button v-for="num in 9" :key="'r'+num" @click="generateCode('RED', num)" class="btn btn-danger num-btn">RED {{num}}</button>
-                </div>
-
-                <div class="small text-muted">Click a button to generate code. Preview on the right.</div>
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                <button v-for="num in 9" :key="'w'+num" @click="generateCode('WHT', num)" class="btn btn-light num-btn">WHT {{num}}</button>
+                <button v-for="num in 9" :key="'b'+num" @click="generateCode('BLU', num)" class="btn btn-primary num-btn">BLU {{num}}</button>
+                <button v-for="num in 9" :key="'g'+num" @click="generateCode('GRN', num)" class="btn btn-success num-btn">GRN {{num}}</button>
+                <button v-for="num in 9" :key="'y'+num" @click="generateCode('YLW', num)" class="btn btn-warning num-btn">YLW {{num}}</button>
+                <button v-for="num in 9" :key="'r'+num" @click="generateCode('RED', num)" class="btn btn-danger num-btn">RED {{num}}</button>
               </div>
+
+              <div class="small text-muted">Click a button to generate code. Preview on the right.</div>
             </div>
+          </div>
 
-            <div class="col-12 col-md-6">
-              <div class="card p-3 text-center">
-                <h6 class="mb-2">Result</h6>
-                <div v-if="finalText">
-                  <div class="fw-semibold mb-2 fs-5">{{ finalText }}</div>
-                  <div id="qrcode-bin"></div>
-                  <svg ref="barcode" id="barcode-bin"></svg>
+          <div class="col-12 col-md-6">
+            <div class="card p-3 text-center">
+              <h6 class="mb-2">Result</h6>
+              <div v-if="finalTextLocal">
+                <div class="fw-semibold mb-2 fs-5">{{ finalTextLocal }}</div>
+                <div id="qrcode-bin" ref="qrcodeBin"></div>
+                <svg ref="barcodeBin" id="barcode-bin"></svg>
+                <div class="mt-3 d-flex gap-2 justify-content-center">
+                  <button class="btn btn-sm btn-primary" @click="copyToClipboard"><i class="fa-regular fa-copy me-2"></i>Copy</button>
+                  <button class="btn btn-sm btn-success" @click="downloadQrBin"><i class="fa-solid fa-download me-2"></i>Download QR</button>
                 </div>
-                <div v-else class="text-muted">No code generated yet — pick a color + number.</div>
               </div>
+              <div v-else class="text-muted">No code generated yet — pick a color + number.</div>
             </div>
           </div>
         </div>
+      </div>
       `,
       setup() {
-        const barcode = ref(null);
-        const finalText = computed(() => store.state.finalText);
+        const qrcodeBin = ref(null);
+        const barcodeBin = ref(null);
+        const finalTextLocal = ref('');
 
-        const generateQRCode = (text) => {
-          const qrEl = document.getElementById("qrcode-bin");
-          if (qrEl) {
-            qrEl.innerHTML = "";
-            new QRCode(qrEl, {
-              text: text,
-              width: Math.min(200, Math.max(120, window.innerWidth * 0.22)),
-              height: Math.min(200, Math.max(120, window.innerWidth * 0.22)),
-              correctLevel: QRCode.CorrectLevel.H
+        // generate QR for bin
+        function renderQRBin(text) {
+          const el = qrcodeBin.value;
+          if (!el) return;
+          el.innerHTML = '';
+          if (!text) return;
+          new QRCode(el, {
+            text: text,
+            width: Math.min(220, Math.max(120, window.innerWidth * 0.22)),
+            height: Math.min(220, Math.max(120, window.innerWidth * 0.22)),
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+
+        function renderBarcodeBin(text) {
+          const svg = barcodeBin.value;
+          if (!svg) return;
+          try {
+            JsBarcode(svg, text, {
+              format: 'CODE128',
+              displayValue: true,
+              lineColor: '#000',
+              width: 2,
+              height: 60,
+              margin: 6
             });
-          }
-        };
+          } catch (e) {}
+        }
 
         const generateCode = (color, num) => {
           const code = `${color}_${num}`;
+          finalTextLocal.value = code;
+          // also inform global store (so Home preview can pick it up if needed)
           store.commit('setFinalText', code);
-          generateQRCode(code);
-          setTimeout(()=> {
-            if (barcode.value) {
-              try{
-                JsBarcode(barcode.value, code, {
-                  format: 'CODE128',
-                  displayValue: true,
-                  lineColor: '#000',
-                  width: 2,
-                  height: 60
-                });
-              }catch(e){}
-            }
-          }, 50);
+          nextTick(() => {
+            renderQRBin(code);
+            renderBarcodeBin(code);
+          });
         };
 
-        onMounted(()=> {
-          const el = document.getElementById('qrcode-bin');
-          if (el) el.innerHTML = '';
+        onMounted(() => {
+          // ensure cleared dom
+          if (qrcodeBin.value) qrcodeBin.value.innerHTML = '';
         });
 
-        return { finalText, barcode, generateCode };
+        const copyToClipboard = async () => {
+          if (!finalTextLocal.value) return alert('Nothing to copy');
+          try {
+            await navigator.clipboard.writeText(finalTextLocal.value);
+            alert('Copied: ' + finalTextLocal.value);
+          } catch {
+            alert('Copy failed');
+          }
+        };
+
+        const downloadQrBin = () => {
+          const el = qrcodeBin.value;
+          if (!el) return alert('QR not found');
+          const img = el.querySelector('img') || el.querySelector('canvas');
+          if (img && (img.src || img.toDataURL)) {
+            const href = img.src || img.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = href;
+            a.download = (finalTextLocal.value || 'qr') + '.png';
+            a.click();
+          } else {
+            alert('Unable to export QR yet.');
+          }
+        };
+
+        return { qrcodeBin, barcodeBin, generateCode, finalTextLocal, copyToClipboard, downloadQrBin };
       }
     };
 
+    // -----------------------
     // ABOUT
+    // -----------------------
     const About = {
       template: `
-        <div>
-          <h4 class="mb-2">About This App</h4>
-          <p class="text-muted">This SPA uses Vue 3, Vuex and Vue Router with JsBarcode and qrcode.js for generating barcodes and QR codes. The UI is rebuilt with Bootstrap 5 and FontAwesome for icons.</p>
-          <ul>
-            <li>Home: carousel gallery + QR generator preview</li>
-            <li>Bin: color + number quick generator</li>
-            <li>Export: copy / download preview (basic)</li>
-          </ul>
-        </div>
+      <div>
+        <h4 class="mb-2">About This App</h4>
+        <p class="text-muted">This SPA uses Vue 3, Vuex and Vue Router with JsBarcode and qrcode.js for generating barcodes and QR codes. The UI uses Bootstrap 5 and FontAwesome for icons.</p>
+        <ul>
+          <li>Home: carousel gallery + QR generator preview</li>
+          <li>Bin: color + number quick generator</li>
+          <li>Export: copy / download preview</li>
+        </ul>
+      </div>
       `
     };
 
-    // ROUTES
+    // -----------------------
+    // Router
+    // -----------------------
     const routes = [
       { path: '/', component: Home },
       { path: '/bin', component: Bin },
-      { path: '/about', component: About }
+      { path: '/about', component: About },
     ];
     const router = createRouter({
       history: createWebHashHistory(),
       routes
     });
 
-    // MOUNT APP
+    // -----------------------
+    // Mount
+    // -----------------------
     const app = createApp({});
     app.use(store);
     app.use(router);
     app.mount('#app');
+
   </script>
 </body>
 </html>

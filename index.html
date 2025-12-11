@@ -109,9 +109,7 @@
 <body>
   <div id="app">
     <!-- Background YouTube (muted + autoplay + loop) -->
-    <div class="bg-youtube" aria-hidden="true">
-      <iframe src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1&controls=0&loop=1&playlist=WymKNMXDEpI&rel=0&showinfo=0" allow="autoplay; encrypted-media" title="Background"></iframe>
-    </div>
+    
 
     <!-- NAVBAR -->
     <header class="app-navbar sticky-top">
@@ -344,6 +342,9 @@
             </div>
 
           </div>
+          <div class="bg-youtube" aria-hidden="true">
+      <iframe src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1&controls=0&loop=1&playlist=WymKNMXDEpI&rel=0&showinfo=0" allow="autoplay; encrypted-media" title="Background"></iframe>
+    </div>
         </div>
         `,
         setup() {
@@ -536,6 +537,9 @@
       const Bin = {
         template: `
         <div>
+        <div class="bg-youtube" aria-hidden="true">
+      <iframe src="https://www.youtube.com/embed/WymKNMXDEpI?autoplay=1&mute=1&controls=0&loop=1&playlist=WymKNMXDEpI&rel=0&showinfo=0" allow="autoplay; encrypted-media" title="Background"></iframe>
+    </div>
           <h4 class="mb-3">Bin Color Generator</h4>
 
           <div class="row gy-3">

@@ -43,7 +43,7 @@ exports.handler = async (event) => {
         id: order.id,
         amount: order.amount,
         currency: order.currency,
-        key: process.env.RAZORPAY_KEY_ID
+        key: process.env.RZP_KEY_ID
       })
     };
 

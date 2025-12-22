@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   const order = await razorpay.orders.create({
     amount: amount * 100,
     currency: "INR",
-    receipt: "netlify_" + Date.now()
+    receipt: "receipt_" + Date.now()
   })
 
   return {
